@@ -6,7 +6,7 @@ Upgraded from a simple script to a modern **multi-page full-stack SPA**, it feat
 
 ---
 
-## 🛠️ System Architecture
+##  System Architecture
 
 ```text
                   +-----------------------------------+
@@ -44,7 +44,7 @@ Upgraded from a simple script to a modern **multi-page full-stack SPA**, it feat
 
 ---
 
-## ✨ Features
+##  Features
 
 - **Auth Gatekeeper**: Secure logins with JWT access tokens and PBKDF2-HMAC-SHA256 password hashing.
 - **Project Workspaces**: Group inspection audits under specific construction sites and export safety ledgers directly to CSV.
@@ -54,7 +54,7 @@ Upgraded from a simple script to a modern **multi-page full-stack SPA**, it feat
 
 ---
 
-## 📂 Repository Index
+##  Repository Index
 
 * `backend/`
   * `main.py` — FastAPI router, authentication middleware, and API endpoints.
@@ -74,7 +74,7 @@ Upgraded from a simple script to a modern **multi-page full-stack SPA**, it feat
 
 ---
 
-## 🚀 Quick Start Instructions
+##  Quick Start Instructions
 
 ### 1. Install Dependencies
 Make sure you have Python 3.10+ installed. Install the requirements:
