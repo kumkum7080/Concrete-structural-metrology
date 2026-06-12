@@ -1,0 +1,30 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.ipynb_checkpoints/
+
+# Virtual environment
+env/
+venv/
+.venv/
+
+# IDE files
+.vscode/
+.idea/
+
+# Local databases
+*.db
+inspectshield.db
+
+# Model checkpoints
+checkpoints/
+best_concrete_model.pth
+
+# Metrology upload media files
+static/uploads/
+data/Positive/
+data/Negative/
+temp_*.png
+temp_test_concrete.png

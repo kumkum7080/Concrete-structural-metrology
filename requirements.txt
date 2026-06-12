@@ -1,0 +1,14 @@
+torch
+torchvision
+albumentations
+opencv-python-headless
+numpy
+scikit-learn
+streamlit
+fastapi
+uvicorn
+sqlalchemy
+python-multipart
+passlib[bcrypt]
+python-jose[cryptography]
+requests

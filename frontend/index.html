@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InspectShield Pro - Structural Metrology Platform</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- CSS Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="light-theme">
+    
+    <!-- AUTHENTICATION CONTAINER (Gatekeeper) -->
+    <div id="auth-container" class="auth-wrapper">
+        <div class="auth-card glass-card">
+            <div class="auth-header">
+                <div class="logo-icon">🛡️</div>
+                <h1>InspectShield Pro</h1>
+                <p>Enterprise Structural Metrology Platform</p>
+            </div>
+            
+            <!-- Tab Headers -->
+            <div class="auth-tabs">
+                <button id="tab-login-btn" class="auth-tab-btn active">Authorize Session</button>
+                <button id="tab-signup-btn" class="auth-tab-btn">Register Inspector</button>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form active">
+                <div class="form-group">
+                    <label for="login-username">Inspector ID (Username)</label>
+                    <input type="text" id="login-username" placeholder="e.g. analyst_402" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Security Credentials (Password)</label>
+                    <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Establish Credentials</button>
+            </form>
+            
+            <!-- Signup Form -->
+            <form id="signup-form" class="auth-form">
+                <div class="form-group">
+                    <label for="signup-username">Preferred Username</label>
+                    <input type="text" id="signup-username" placeholder="e.g. engineer_smith" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Secure Password</label>
+                    <input type="password" id="signup-password" placeholder="••••••••" required autocomplete="new-password">
+                </div>
+                <button type="submit" class="btn btn-secondary btn-block">Register Credentials</button>
+            </form>
+            
+            <div id="auth-status-msg" class="status-msg"></div>
+        </div>
+    </div>
+
+    <!-- MAIN PLATFORM INTERFACE -->
+    <div id="app-container" class="app-wrapper" style="display: none;">
+        
+        <!-- SIDEBAR NAVIGATION -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo-symbol">🛡️</span>
+                <div class="logo-text">
+                    <h2>InspectShield</h2>
+                    <span>METROLOGY PRO</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#" class="nav-link active" data-target="panel-dashboard">📊 &nbsp; Dashboard</a></li>
+                    <li><a href="#" class="nav-link" data-target="panel-projects">🏢 &nbsp; Projects & Sites</a></li>
+                    <li><a href="#" class="nav-link" data-target="panel-metrology">🔬 &nbsp; Metrology Studio</a></li>
+                    <li><a href="#" class="nav-link" data-target="panel-ledger">📋 &nbsp; Audit Ledger</a></li>
+                    <li><a href="#" class="nav-link" data-target="panel-model">🧠 &nbsp; Model Studio</a></li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar">👨‍💻</div>
+                    <div class="user-info">
+                        <h4 id="user-display-name">Inspector</h4>
+                        <span id="user-role-badge">Field Analyst</span>
+                    </div>
+                </div>
+                <button id="logout-btn" class="btn btn-danger btn-sm btn-block">Log Out Session</button>
+            </div>
+        </aside>
+        
+        <!-- CONTENT VIEWPORT -->
+        <main class="main-content">
+            
+            <!-- HEADER BAR -->
+            <header class="content-header">
+                <h1 id="page-title-heading">Metrology Command Center</h1>
+                <div class="header-actions">
+                    <button id="theme-toggle" class="btn-theme-toggle">🌓</button>
+                    <span id="current-time-string">SYSTEM ACTIVE</span>
+                </div>
+            </header>
+            
+            <div class="panel-container">
+                
+                <!-- 1. DASHBOARD VIEW -->
+                <section id="panel-dashboard" class="app-panel active">
+                    <div class="metrics-grid">
+                        <div class="metric-card glass-card">
+                            <span class="m-icon icon-blue">🔬</span>
+                            <div class="m-data">
+                                <h3>Total Inspections</h3>
+                                <p id="dash-total-inspections">0</p>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-card">
+                            <span class="m-icon icon-yellow">⚠️</span>
+                            <div class="m-data">
+                                <h3>Warning Alerts</h3>
+                                <p id="dash-warning-inspections">0</p>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-card">
+                            <span class="m-icon icon-red">🚨</span>
+                            <div class="m-data">
+                                <h3>Critical Fractures</h3>
+                                <p id="dash-critical-inspections">0</p>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-card">
+                            <span class="m-icon icon-green">✅</span>
+                            <div class="m-data">
+                                <h3>Clean Surfaces</h3>
+                                <p id="dash-clean-inspections">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-layouts">
+                        <div class="layout-left glass-card">
+                            <h3>📈 Structural Safety Distribution</h3>
+                            <div class="chart-container">
+                                <canvas id="severityPieChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="layout-right glass-card">
+                            <h3>📋 Recent Asset Reports</h3>
+                            <div class="recent-inspections-list">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Timestamp</th>
+                                            <th>Filename</th>
+                                            <th>Width</th>
+                                            <th>Severity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dash-recent-inspections">
+                                        <!-- Dynamic entries -->
+                                        <tr><td colspan="4" class="text-center">No reports cataloged yet.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- 2. PROJECTS PANEL -->
+                <section id="panel-projects" class="app-panel">
+                    <div class="dashboard-layouts">
+                        <div class="layout-left glass-card">
+                            <h3>🏢 Catalog New Construction Site</h3>
+                            <form id="new-project-form">
+                                <div class="form-group">
+                                    <label for="proj-name">Site/Project Name *</label>
+                                    <input type="text" id="proj-name" placeholder="e.g. Metro Line Segment C" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="proj-location">Physical Location</label>
+                                    <input type="text" id="proj-location" placeholder="e.g. Pier 12, Expressway North">
+                                </div>
+                                <div class="form-group">
+                                    <label for="proj-desc">Scope Description</label>
+                                    <textarea id="proj-desc" rows="3" placeholder="Concrete core samples, deck slabs, column testing..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Create Site Record</button>
+                            </form>
+                        </div>
+                        <div class="layout-right glass-card">
+                            <h3>🏢 Tracked Construction Sites</h3>
+                            <div class="projects-list-wrapper">
+                                <div id="projects-list" class="grid-list">
+                                    <!-- Dynamic entries -->
+                                    <p class="text-center">No projects cataloged yet.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- 3. METROLOGY STUDIO PANEL -->
+                <section id="panel-metrology" class="app-panel">
+                    <div class="metrology-grid">
+                        
+                        <!-- Configuration Controls -->
+                        <div class="metrology-sidebar glass-card">
+                            <h3>⚙️ Metrology Settings</h3>
+                            <form id="metrology-form">
+                                
+                                <div class="form-group">
+                                    <label for="met-project-select">Active Project Scope</label>
+                                    <select id="met-project-select">
+                                        <option value="">Unassigned (General Audit)</option>
+                                    </select>
+                                </div>
+                                
+                                <hr class="form-divider">
+                                
+                                <div class="form-group">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" id="met-force-stage2">
+                                        <span class="checkmark"></span>
+                                        Force Stage 2 Metrology
+                                    </label>
+                                    <small class="form-tip">Bypass neural net Stage 1 filter to run OpenCV measurements directly.</small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="met-method">CV Pre-processing Method</label>
+                                    <select id="met-method">
+                                        <option value="frangi">Frangi Vesselness Filter (Enhanced)</option>
+                                        <option value="adaptive">Adaptive Gaussian Threshold (Standard)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group" id="frangi-slider-group">
+                                    <label for="met-frangi-thresh">Frangi Sensitivity Threshold: <span id="frangi-thresh-val">40</span></label>
+                                    <input type="range" id="met-frangi-thresh" min="10" max="100" value="40" class="slider">
+                                    <small class="form-tip">Lower values catch thin microcracks; higher values ignore texture noise.</small>
+                                </div>
+                                
+                                <hr class="form-divider">
+                                
+                                <h4>📏 Scaling Calibration</h4>
+                                
+                                <div class="form-group">
+                                    <label for="met-scale-ratio">Pixel-to-mm Ratio: <span id="scale-ratio-val">0.1500</span></label>
+                                    <input type="number" id="met-scale-ratio" step="0.0001" min="0.001" max="1.0" value="0.1500" class="input-inline">
+                                </div>
+                                
+                                <button type="button" id="open-calibrate-btn" class="btn btn-secondary btn-block">📏 Draw On-Image Ruler</button>
+                                <small class="form-tip">Click to trace a reference object (e.g. a ruler) on the image to auto-calculate the ratio.</small>
+                                
+                                <hr class="form-divider">
+                                
+                                <div class="form-group">
+                                    <label for="met-notes">Audit Notes</label>
+                                    <textarea id="met-notes" rows="2" placeholder="e.g. Visual water leak near crack path."></textarea>
+                                </div>
+                                
+                                <button type="submit" id="execute-metrology-btn" class="btn btn-success btn-block btn-lg" disabled>🚀 Run Stage Metrology</button>
+                            </form>
+                        </div>
+                        
+                        <!-- Upload and Visualizing Studio -->
+                        <div class="metrology-studio glass-card">
+                            <div class="studio-header">
+                                <h3>🔬 Interactive metrology Workbench</h3>
+                                <span id="stage-status-badge" class="badge badge-gray">IDLE</span>
+                            </div>
+                            
+                            <!-- Upload Box -->
+                            <div id="drop-zone" class="upload-dropzone">
+                                <div class="dropzone-prompt">
+                                    <span class="upload-icon">📷</span>
+                                    <h3>Drag & Drop Surface Scan</h3>
+                                    <p>Supports PNG, JPG, JPEG formats</p>
+                                    <button class="btn btn-secondary" onclick="document.getElementById('file-input').click()">Browse Files</button>
+                                    <input type="file" id="file-input" style="display: none;" accept="image/*">
+                                </div>
+                                <div id="preview-container" class="preview-box" style="display:none;">
+                                    <canvas id="calibration-canvas"></canvas>
+                                    <div class="canvas-overlay-bar" id="calibration-instructions" style="display:none;">
+                                        <span>Click & drag a line on the image. Click Done to calibrate.</span>
+                                        <button id="close-calibration-btn" class="btn btn-xs btn-danger">Cancel</button>
+                                    </div>
+                                    <img id="image-preview" alt="Concrete surface upload">
+                                </div>
+                            </div>
+                            
+                            <!-- Calibration Modal Prompt -->
+                            <div id="calibration-prompt-modal" class="modal-dialog" style="display: none;">
+                                <div class="modal-content glass-card">
+                                    <h4>Enter Physical Reference Dimensions</h4>
+                                    <p>You drew a line of <strong id="drawn-pixels-count">0</strong> pixels.</p>
+                                    <div class="form-group">
+                                        <label for="real-world-distance">Physical Distance (in mm):</label>
+                                        <input type="number" id="real-world-distance" min="0.1" step="0.1" value="10.0">
+                                    </div>
+                                    <div class="modal-actions">
+                                        <button id="apply-calibration-btn" class="btn btn-success">Calibrate Ratio</button>
+                                        <button id="cancel-calibration-btn" class="btn btn-secondary">Discard</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Output Visual Matrix -->
+                            <div id="output-matrix" class="outputs-matrix-wrapper" style="display: none;">
+                                
+                                <div class="diag-cards-row">
+                                    <div class="diag-card">
+                                        <h5>Maximum Width</h5>
+                                        <h2 id="out-width">0.0 mm</h2>
+                                    </div>
+                                    <div class="diag-card">
+                                        <h5>Defect Length</h5>
+                                        <h2 id="out-length">0.0 mm</h2>
+                                    </div>
+                                    <div class="diag-card">
+                                        <h5>Evaluated Classification</h5>
+                                        <span id="out-severity-badge" class="badge">Intact</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="tab-selectors">
+                                    <button class="matrix-tab active" data-tab="tab-raw">Original Image</button>
+                                    <button class="matrix-tab" data-tab="tab-mask">Stage 2 Mask</button>
+                                    <button class="matrix-tab" data-tab="tab-skel">Spine Skeleton</button>
+                                </div>
+                                
+                                <div class="matrix-tab-content active" id="tab-raw">
+                                    <img id="out-img-raw" class="matrix-image" alt="Original surface image">
+                                </div>
+                                <div class="matrix-tab-content" id="tab-mask">
+                                    <img id="out-img-mask" class="matrix-image" alt="OpenCV extraction mask">
+                                </div>
+                                <div class="matrix-tab-content" id="tab-skel">
+                                    <img id="out-img-skel" class="matrix-image" alt="Crack mathematical skeleton">
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- 4. AUDIT LEDGER PANEL -->
+                <section id="panel-ledger" class="app-panel">
+                    <div class="glass-card">
+                        <div class="ledger-header">
+                            <div class="ledger-title-sec">
+                                <h3>📋 Complete Inspection History Ledger</h3>
+                                <p>Review, filter, and export the official structural safety ledger.</p>
+                            </div>
+                            <div class="ledger-actions">
+                                <a id="export-csv-btn" class="btn btn-secondary">📥 Export Ledger (CSV)</a>
+                            </div>
+                        </div>
+                        
+                        <div class="ledger-filters-bar">
+                            <input type="text" id="ledger-search" placeholder="Search by filename or notes...">
+                            <select id="ledger-severity-filter">
+                                <option value="">Filter by Severity (All)</option>
+                                <option value="Intact">Surface Intact</option>
+                                <option value="Hairline">Hairline Microcrack</option>
+                                <option value="Moderate">Medium Fracture</option>
+                                <option value="Critical">CRITICAL BREAK</option>
+                            </select>
+                        </div>
+                        
+                        <div class="table-wrapper">
+                            <table class="data-table" id="ledger-table">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Project Scope</th>
+                                        <th>Filename</th>
+                                        <th>Max Width</th>
+                                        <th>Tracked Length</th>
+                                        <th>Safety Classification</th>
+                                        <th>Notes</th>
+                                        <th class="text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ledger-rows">
+                                    <tr><td colspan="8" class="text-center">No reports mapped to database.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- 5. MODEL STUDIO PANEL -->
+                <section id="panel-model" class="app-panel">
+                    <div class="model-studio-grid">
+                        
+                        <!-- Left Block: Active configuration & seed data -->
+                        <div class="studio-subcard glass-card">
+                            <h3>🧠 Active Deep Learning Engine</h3>
+                            
+                            <div class="active-model-stats">
+                                <div class="stat-row">
+                                    <span>Classifier Backbone:</span>
+                                    <strong id="active-backbone-name">loading...</strong>
+                                </div>
+                                <div class="stat-row">
+                                    <span>Model Weights Loaded:</span>
+                                    <strong id="active-weights-status">loading...</strong>
+                                </div>
+                                <div class="stat-row">
+                                    <span>Compute Device:</span>
+                                    <strong id="active-device-status">loading...</strong>
+                                </div>
+                                <div class="stat-row">
+                                    <span>Last Updated:</span>
+                                    <strong id="active-modified-time">loading...</strong>
+                                </div>
+                            </div>
+                            
+                            <hr class="form-divider">
+                            
+                            <h3>⚙️ Update Active Backbone</h3>
+                            <form id="change-backbone-form">
+                                <div class="form-group">
+                                    <label for="change-backbone-select">Select Primary Network</label>
+                                    <select id="change-backbone-select">
+                                        <option value="efficientnet_b0">EfficientNet-B0 (Edge optimized - 5.3M params)</option>
+                                        <option value="efficientnet_b2">EfficientNet-B2 (High accuracy - 9.2M params)</option>
+                                        <option value="resnet34">ResNet-34 (Standard residual - 21.8M params)</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-secondary">Deploy Selected Model</button>
+                            </form>
+                            
+                            <hr class="form-divider">
+                            
+                            <h3>🌾 Seed Training Dataset</h3>
+                            <p class="form-tip">Generate synthetic concrete samples directly on the server to seed the training folders.</p>
+                            <form id="seed-data-form">
+                                <div class="form-group">
+                                    <label for="seed-count">Samples per Class (Positive & Negative):</label>
+                                    <input type="number" id="seed-count" min="10" max="200" value="30">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Generate Synthetic Dataset</button>
+                            </form>
+                        </div>
+                        
+                        <!-- Right Block: Model Training controls and logs -->
+                        <div class="studio-subcard glass-card">
+                            <h3>🧠 Optimize Model Classifier</h3>
+                            <p class="form-tip">Initiate custom neural network training using local files inside <code>/data/Positive</code> and <code>/data/Negative</code>.</p>
+                            
+                            <form id="train-model-form">
+                                <div class="form-row">
+                                    <div class="form-group col-6">
+                                        <label for="train-backbone-select">Backbone Model</label>
+                                        <select id="train-backbone-select">
+                                            <option value="efficientnet_b0">EfficientNet-B0</option>
+                                            <option value="efficientnet_b2">EfficientNet-B2</option>
+                                            <option value="resnet34">ResNet-34</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-6">
+                                        <label for="train-epochs">Epochs (Iterations)</label>
+                                        <input type="number" id="train-epochs" min="1" max="50" value="5">
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" id="start-training-btn" class="btn btn-success btn-block">🚀 Run Model Optimization</button>
+                            </form>
+                            
+                            <div id="training-progress-box" class="training-progress-wrapper" style="display: none;">
+                                <div class="progress-details">
+                                    <span>Status: <strong id="train-status-label" class="text-yellow">Queued</strong></span>
+                                    <span>Epoch: <strong id="train-epoch-label">0/0</strong></span>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div id="train-progress-bar" class="progress-bar" style="width: 0%;"></div>
+                                </div>
+                                <div class="metrics-row">
+                                    <div class="mini-metric">
+                                        <span>Val Loss</span>
+                                        <h4 id="train-loss-label">--</h4>
+                                    </div>
+                                    <div class="mini-metric">
+                                        <span>Val Accuracy</span>
+                                        <h4 id="train-acc-label">--</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="log-stream-wrapper">
+                                <h4>📃 Live Execution Logs</h4>
+                                <pre id="training-log-console">Console idle. Awaiting model optimization start...</pre>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </section>
+                
+            </div>
+            
+        </main>
+        
+    </div>
+    
+    <!-- Script file -->
+    <script src="app.js"></script>
+</body>
+</html>
